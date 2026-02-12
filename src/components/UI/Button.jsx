@@ -1,7 +1,14 @@
 import React from "react";
 import { FaArrowRight } from "react-icons/fa6";
 
-const Button = ({ children, variant = "primary", disabled = false, onClick, className = "" }) => {
+const Button = ({
+  children,
+  variant = "primary",
+  type = "button",
+  disabled = false,
+  onClick,
+  className = "",
+}) => {
   const base =
     "inline-flex items-center justify-center gap-2 font-medium text-lg px-8 py-3 transition-all duration-300";
 
@@ -31,6 +38,7 @@ const Button = ({ children, variant = "primary", disabled = false, onClick, clas
 
   return (
     <button
+      type={type}
       disabled={disabled}
       onClick={onClick}
       className={`${base} ${variants[variant]} ${className}`}

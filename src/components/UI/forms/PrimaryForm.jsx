@@ -1,29 +1,44 @@
-import React, { useState } from "react";
+import React, { useId, useMemo, useState } from "react";
 
 const PrimaryForm = ({
   label,
   children = "Text",
+  placeholder,
   className = "",
   labelClassName = "",
   type = "text",
   onChange,
+  value: controlledValue,
+  defaultValue = "",
+  id,
+  name,
+  required = false,
+  disabled = false,
+  autoComplete,
+  inputMode,
 }) => {
-  const [value, setValue] = useState("");
+  const reactId = useId();
+  const inputId = useMemo(() => id || name || `primary-input-${reactId}`, [id, name, reactId]);
+
+  const isControlled = controlledValue !== undefined;
+  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
   const [focused, setFocused] = useState(false);
 
   const handleChange = (e) => {
-    setValue(e.target.value);
+    if (!isControlled) setUncontrolledValue(e.target.value);
     if (onChange) onChange(e.target.value);
   };
 
+  const value = isControlled ? controlledValue : uncontrolledValue;
   const showLabel = focused || value.length > 0;
+  const inputPlaceholder = placeholder ?? children;
 
   return (
     <div className={`w-full ${className}`}>
       <div className="mb-4 w-full">
         {label && (
           <label
-            htmlFor="primary-input"
+            htmlFor={inputId}
             className={`block text-black font-medium mb-2 ${labelClassName}`}
           >
             {label}
@@ -32,13 +47,18 @@ const PrimaryForm = ({
 
         <div className="relative w-full">
           <input
-            id="primary-input"
+            id={inputId}
+            name={name}
             type={type}
             value={value}
-            placeholder={showLabel ? "" : children}
+            placeholder={showLabel ? "" : inputPlaceholder}
             onChange={handleChange}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
+            required={required}
+            disabled={disabled}
+            autoComplete={autoComplete}
+            inputMode={inputMode}
             className="
               w-full 
               rounded

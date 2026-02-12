@@ -589,6 +589,13 @@ export default {
       portfolio: "Portfolio",
       upload: "Upload file",
       submit: "Submit application",
+      status: {
+        sending: "Sending…",
+        success: "Thanks! We’ll contact you soon.",
+        error: "Failed to send. Please try again.",
+        timeout: "Server is taking too long to respond. Please try again in a moment.",
+        required: "Please fill in all required fields.",
+      },
     },
   },
   dropdownForm: {

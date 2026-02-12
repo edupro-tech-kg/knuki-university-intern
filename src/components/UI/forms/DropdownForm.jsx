@@ -1,22 +1,28 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IoIosArrowDown } from "react-icons/io";
 
-const DropdownForm = ({ fields = [], className = "", labelClassName = "" }) => {
+const DropdownForm = ({ fields = [], className = "", labelClassName = "", values, onChange }) => {
   const { t } = useTranslation();
   const select = t("dropdownForm.select");
 
-  const [values, setValues] = useState(
-    fields.reduce((acc, field) => {
-      acc[field.name] = field.defaultValue || "";
-      return acc;
-    }, {})
+  const isControlled = values !== undefined;
+  const initialValues = useMemo(
+    () =>
+      fields.reduce((acc, field) => {
+        acc[field.name] = field.defaultValue || "";
+        return acc;
+      }, {}),
+    [fields]
   );
+  const [uncontrolledValues, setUncontrolledValues] = useState(initialValues);
+  const currentValues = isControlled ? values : uncontrolledValues;
 
   const handleChange = (name, value) => {
-    setValues((prev) => ({ ...prev, [name]: value }));
+    if (!isControlled) setUncontrolledValues((prev) => ({ ...prev, [name]: value }));
     const field = fields.find((f) => f.name === name);
     if (field?.onChange) field.onChange(value);
+    if (onChange) onChange(name, value);
   };
 
   return (
@@ -36,9 +42,10 @@ const DropdownForm = ({ fields = [], className = "", labelClassName = "" }) => {
           <div className="relative w-full">
             <select
               id={field.name}
-              value={values[field.name]}
+              value={currentValues[field.name] ?? ""}
               onChange={(e) => handleChange(field.name, e.target.value)}
               disabled={field.disabled}
+              required={field.required}
               className="
                 w-full 
                 rounded
