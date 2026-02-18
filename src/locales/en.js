@@ -532,6 +532,9 @@ export default {
     title: "NEWS",
     pageHeading: "News and updates",
     readMore: "Read more",
+    loading: "Loading news...",
+    error: "Error loading news. Please try again later.",
+    empty: "No news available.",
     items: [
       {
         id: "makam",

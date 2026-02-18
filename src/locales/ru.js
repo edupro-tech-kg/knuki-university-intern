@@ -571,6 +571,9 @@ export default {
     title: "НОВОСТИ",
     pageHeading: "Новости и события",
     readMore: "Подробнее",
+    loading: "Загрузка новостей…",
+    error: "Ошибка загрузки новостей. Попробуйте позже.",
+    empty: "Нет новостей.",
     items: [
       {
         id: "makam",
