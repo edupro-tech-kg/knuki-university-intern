@@ -29,10 +29,20 @@ export default function NewsList() {
         setLoading(true);
         setError(null);
         const data = await getNews();
-        setNewsItems(data);
+        console.log("API RESPONSE:", data);
+        if (!data || data.length === 0) {
+          setNewsItems([]);
+        } else {
+          setNewsItems(data);
+        }
       } catch (err) {
-        console.error(err);
+        console.error("real error:",err);
         setError("Failed to load news");
+        if (err.response?.status >= 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setNewsItems([])
+        }
       } finally {
         setLoading(false);
       }
