@@ -118,7 +118,8 @@ function ManagementModal({ isOpen, onClose, person }) {
           className="absolute top-3 right-3 sm:top-4 sm:right-4 md:top-6 md:right-6 w-8 h-8 z-20 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors"
           aria-label="Close"
         >
-          <span className="text-xl">×</span>
+          <span
+          className="text-xl">×</span>
         </button>
 
         <div className="bg-white rounded-lg w-full max-h-[90vh] md:max-h-[85vh] flex flex-col md:flex-row overflow-hidden shadow-2xl">
