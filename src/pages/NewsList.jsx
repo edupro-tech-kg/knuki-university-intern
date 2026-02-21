@@ -35,12 +35,13 @@ export default function NewsList() {
         } else {
           setNewsItems(data);
         }
-      } catch (err) {
-        console.error("real error:",err);
+      } catch (error) {
+        console.error("real error:", error);
         setError("Failed to load news");
-        if (err.response?.status >= 500) {
+        if (error.response?.status >= 500) {
           setError("Server error. Please try again later.");
         } else {
+          setError("Failed to load news.");
           setNewsItems([])
         }
       } finally {
