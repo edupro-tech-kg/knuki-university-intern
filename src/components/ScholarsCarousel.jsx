@@ -1,18 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { getScholarship } from "../api/certificates";
 
 function ScholarsCarousel({ variant = "national", showTitle = true }) {
   const { t } = useTranslation();
-  const scholars = t("scholars", { returnObjects: true }) || {};
-
   const containerRef = useRef(null);
   const [showControls, setShowControls] = useState(false);
-
-  const list =
-    variant === "presidential"
-      ? scholars.presidentialScholars || []
-      : scholars.nationalScholars || [];
+  const [national, setNational] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const title = variant === "presidential" ? t("scholars.presidential") : t("scholars.national");
 
@@ -27,7 +24,7 @@ function ScholarsCarousel({ variant = "national", showTitle = true }) {
     checkControls();
     window.addEventListener("resize", checkControls);
     return () => window.removeEventListener("resize", checkControls);
-  }, [list]);
+  }, []);
 
   const scrollByAmount = (dir) => {
     if (!containerRef.current) return;
@@ -37,6 +34,29 @@ function ScholarsCarousel({ variant = "national", showTitle = true }) {
     const amount = cardWidth + gap;
     containerRef.current.scrollBy({ left: dir * amount, behavior: "smooth" });
   };
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await getScholarship();
+
+        const filtered = data.filter(
+          (student) => student.scholarship_type === variant);
+        setNational(filtered);
+
+      } catch (err) {
+        console.error("Failed to load scholarship data:", err);
+        setError("Failed to load data");
+      }
+      finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [variant]);
 
   return (
     <div className="my-12">
@@ -51,7 +71,14 @@ function ScholarsCarousel({ variant = "national", showTitle = true }) {
           ref={containerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide sm:px-10 lg:px-16 py-2 snap-x snap-mandatory"
         >
-          {list.map((item, index) => (
+          {/* LOADING */}
+          {loading && (<div className="text-center text-gray-500 text-xl">{t("studentStructure.loading")}</div>)}
+          {/* ERROR */}
+          {error && (<div className="text-center text-red-500 text-xl">{t("studentStructure.error")}</div>)}
+          {/* EMPTY */}
+          {!loading && !error && national.length === 0 && (<div className="text-center text-gray-500 text-xl">{t("studentStructure.empty")}</div>)}
+
+          {national.map((item, index) => (
             <div
               key={`${variant}-${index}`}
               className="chairman-card-item flex flex-col items-center gap-3 p-6 border border-gray-200 rounded-[20px] shadow-sm bg-white w-[260px] sm:w-[280px] lg:w-[300px] flex-shrink-0 snap-start"
