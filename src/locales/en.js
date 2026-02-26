@@ -532,9 +532,6 @@ export default {
     title: "NEWS",
     pageHeading: "News and updates",
     readMore: "Read more",
-    loading: "Loading news...",
-    error: "Error loading news. Please try again later.",
-    empty: "No news available.",
     items: [
       {
         id: "makam",
@@ -743,10 +740,6 @@ export default {
       "Within its competence, the Student Council is a structural unit of the university, ensuring the implementation of state youth policy within the educational organization.",
       "In December 2023, a special Regulation on the Chairperson of the Student Council and the Student Ombudsman was developed and approved, according to which the elections of the structure's leaders were held.",
     ],
-     loading: "Loading certificates...",
-    error: "Error loading certificates. Please try again later.",
-    empty: "No certificates available."
-    
   },
   studentsInfo: [
     {

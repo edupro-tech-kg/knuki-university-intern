@@ -1,17 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-import { getScholarship } from "../api/certificates";
 
-function ScholarsCarousel({ variant = "scholarship", showTitle = true }) {
+function ScholarsCarousel({ variant = "national", showTitle = true }) {
   const { t } = useTranslation();
+  const scholars = t("scholars", { returnObjects: true }) || {};
+
   const containerRef = useRef(null);
   const [showControls, setShowControls] = useState(false);
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  const title = variant === "presidential_scholarship" ? t("scholars.presidential") : t("scholars.national");
+  const list =
+    variant === "presidential"
+      ? scholars.presidentialScholars || []
+      : scholars.nationalScholars || [];
+
+  const title = variant === "presidential" ? t("scholars.presidential") : t("scholars.national");
 
   useEffect(() => {
     const checkControls = () => {
@@ -24,7 +27,7 @@ function ScholarsCarousel({ variant = "scholarship", showTitle = true }) {
     checkControls();
     window.addEventListener("resize", checkControls);
     return () => window.removeEventListener("resize", checkControls);
-  }, []);
+  }, [list]);
 
   const scrollByAmount = (dir) => {
     if (!containerRef.current) return;
@@ -34,29 +37,6 @@ function ScholarsCarousel({ variant = "scholarship", showTitle = true }) {
     const amount = cardWidth + gap;
     containerRef.current.scrollBy({ left: dir * amount, behavior: "smooth" });
   };
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const endpointType =
-          variant === "national" ? "scholarship" : "presidential_scholarship";
-
-        const data = await getScholarship(endpointType);
-        setStudents(data);
-
-      } catch (err) {
-        console.error("Failed to load scholarship data:", err);
-        setError("Failed to load data");
-      }
-      finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, [variant]);
 
   return (
     <div className="my-12">
@@ -71,14 +51,7 @@ function ScholarsCarousel({ variant = "scholarship", showTitle = true }) {
           ref={containerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide sm:px-10 lg:px-16 py-2 snap-x snap-mandatory"
         >
-          {/* LOADING */}
-          {loading && (<div className="text-center text-gray-500 text-xl">{t("studentStructure.loading")}</div>)}
-          {/* ERROR */}
-          {error && (<div className="text-center text-red-500 text-xl">{t("studentStructure.error")}</div>)}
-          {/* EMPTY */}
-          {!loading && !error && students.length === 0 && (<div className="text-center text-gray-500 text-xl">{t("studentStructure.empty")}</div>)}
-
-          {students.map((item, index) => (
+          {list.map((item, index) => (
             <div
               key={`${variant}-${index}`}
               className="chairman-card-item flex flex-col items-center gap-3 p-6 border border-gray-200 rounded-[20px] shadow-sm bg-white w-[260px] sm:w-[280px] lg:w-[300px] flex-shrink-0 snap-start"
@@ -88,9 +61,9 @@ function ScholarsCarousel({ variant = "scholarship", showTitle = true }) {
               </span>
 
               <div className="text-center">
-                <h4 className="text-lg font-semibold">{item.full_name}</h4>
-                {item.position && (
-                  <p className="text-gray-600 mt-1 text-sm">{item.position}</p>
+                <h4 className="text-lg font-semibold">{item.name}</h4>
+                {variant === "national" && item.awardedBy && (
+                  <p className="text-gray-600 mt-1 text-sm">{item.awardedBy}</p>
                 )}
                 {item.year && (
                   <p className="text-gray-700 mt-2 text-base leading-6 font-medium">{item.year}</p>
