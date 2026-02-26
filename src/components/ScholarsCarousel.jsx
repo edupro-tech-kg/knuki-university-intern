@@ -3,15 +3,15 @@ import { useTranslation } from "react-i18next";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { getScholarship } from "../api/certificates";
 
-function ScholarsCarousel({ variant = "national", showTitle = true }) {
+function ScholarsCarousel({ variant = "scholarship", showTitle = true }) {
   const { t } = useTranslation();
   const containerRef = useRef(null);
   const [showControls, setShowControls] = useState(false);
-  const [national, setNational] = useState([]);
+  const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const title = variant === "presidential" ? t("scholars.presidential") : t("scholars.national");
+  const title = variant === "presidential_scholarship" ? t("scholars.presidential") : t("scholars.national");
 
   useEffect(() => {
     const checkControls = () => {
@@ -41,11 +41,11 @@ function ScholarsCarousel({ variant = "national", showTitle = true }) {
         setLoading(true);
         setError(null);
 
-        const data = await getScholarship();
+        const endpointType =
+          variant === "national" ? "scholarship" : "presidential_scholarship";
 
-        const filtered = data.filter(
-          (student) => student.scholarship_type === variant);
-        setNational(filtered);
+        const data = await getScholarship(endpointType);
+        setStudents(data);
 
       } catch (err) {
         console.error("Failed to load scholarship data:", err);
@@ -76,9 +76,9 @@ function ScholarsCarousel({ variant = "national", showTitle = true }) {
           {/* ERROR */}
           {error && (<div className="text-center text-red-500 text-xl">{t("studentStructure.error")}</div>)}
           {/* EMPTY */}
-          {!loading && !error && national.length === 0 && (<div className="text-center text-gray-500 text-xl">{t("studentStructure.empty")}</div>)}
+          {!loading && !error && students.length === 0 && (<div className="text-center text-gray-500 text-xl">{t("studentStructure.empty")}</div>)}
 
-          {national.map((item, index) => (
+          {students.map((item, index) => (
             <div
               key={`${variant}-${index}`}
               className="chairman-card-item flex flex-col items-center gap-3 p-6 border border-gray-200 rounded-[20px] shadow-sm bg-white w-[260px] sm:w-[280px] lg:w-[300px] flex-shrink-0 snap-start"
@@ -88,9 +88,9 @@ function ScholarsCarousel({ variant = "national", showTitle = true }) {
               </span>
 
               <div className="text-center">
-                <h4 className="text-lg font-semibold">{item.name}</h4>
-                {variant === "national" && item.awardedBy && (
-                  <p className="text-gray-600 mt-1 text-sm">{item.awardedBy}</p>
+                <h4 className="text-lg font-semibold">{item.full_name}</h4>
+                {item.position && (
+                  <p className="text-gray-600 mt-1 text-sm">{item.position}</p>
                 )}
                 {item.year && (
                   <p className="text-gray-700 mt-2 text-base leading-6 font-medium">{item.year}</p>
