@@ -1,10 +1,31 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getStudents } from "../api/students";
 
 function StudentsInfo() {
   const { t } = useTranslation();
-  const students = t("studentsInfo", { returnObjects: true });
   const scrollRef = useRef(null);
+  const [students, setStudents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+useEffect(() => {
+  async function loadStudents() {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await getStudents();
+      setStudents(data);
+    } catch (error) {
+      console.error("Failed to load students:", error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  loadStudents();
+  }, []);
 
   const handleScroll = () => {
     const el = scrollRef.current;
@@ -41,8 +62,14 @@ function StudentsInfo() {
             display: none;
           }
         `}</style>
+  {isLoading && (<div className="w-full text-center py-10 text-gray-500">{t("students.loading")}</div>)}
 
-        {students.map((item, index) => (
+  {error && (<div className="w-full text-center py-10 text-red-500">
+    {t("students.error")}</div>)}
+
+  {!isLoading && !error && students.length === 0 && (<div className="w-full text-center py-10 text-gray-500">
+      {t("students.empty")}</div>)}
+{!isLoading && !error && students.length > 0 && students.map((item, index) => (
           <div
             key={index}
             className="
@@ -59,16 +86,16 @@ function StudentsInfo() {
             <div className="w-full aspect-[4/3] mb-4 overflow-hidden rounded-lg">
               <img
                 src={item.image}
-                alt={item.name}
+                alt={item.full_name}
                 className="w-full h-full object-cover object-top"
                 loading="lazy"
               />
             </div>
 
-            <h4 className="text-lg font-semibold mb-2">{item.name}</h4>
+            <h4 className="text-lg font-semibold mb-2">{item.full_name}</h4>
 
-            <p className="text-gray-600 text-sm md:text-base">{item.content}</p>
-          </div>
+            <p className="text-gray-600 text-sm md:text-base">{item.position}</p>
+         </div>
         ))}
       </div>
     </section>

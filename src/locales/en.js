@@ -748,6 +748,11 @@ export default {
     empty: "No certificates available."
     
   },
+  students: {
+    loading: "Loading student information...",
+    error: "Error loading student information. Please try again later.",
+    empty: "No student information available.",
+  },
   studentsInfo: [
     {
       image: "/photo-placeholder.svg",
