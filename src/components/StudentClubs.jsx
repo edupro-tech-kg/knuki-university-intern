@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import getOrganizations from "../api/organizations";
 
 function ClubGroup({ items }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -11,16 +12,16 @@ function ClubGroup({ items }) {
         {/* Tabs */}
         <div className="bg-[#A62623] p-2 rounded-xl border border-[#751715]">
           <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-2 px-1 pb-1 sm:px-0 sm:pb-0">
+
             {items.map((club, idx) => (
               <button
                 key={club.key || club.name}
                 onClick={() => setActiveIndex(idx)}
                 className={`flex-1 px-4 py-3 rounded-md text-sm font-medium transition-colors border text-center
-                ${
-                  idx === activeIndex
+                ${idx === activeIndex
                     ? "bg-white text-[#751715] border-[#751715] shadow-sm"
                     : "bg-[#751715] text-white border-[#A62623] hover:bg-[#8c1f1f] hover:border-[#8c1f1f]"
-                }
+                  }
               `}
               >
                 <span className="line-clamp-2">{club.name}</span>
@@ -89,21 +90,39 @@ function ClubGroup({ items }) {
 
 export default function StudentClubs() {
   const { t } = useTranslation();
-  const clubs = t("studentClubs", { returnObjects: true }) || [];
-  const chunkSize = 3;
-  const groups = [];
-  for (let i = 0; i < clubs.length; i += chunkSize) {
-    const group = clubs.slice(i, i + chunkSize).filter(Boolean);
-    if (group.length) groups.push(group);
-  }
+  const [organizations, setOrganizations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  if (!groups.length) return null;
+  useEffect(() => {
+    async function loadOrganizations() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getOrganizations();
+        setOrganizations(data);
+      } catch (error) {
+        console.error("Error loading organizations:", error);
+        setError("Failed to load organizations. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadOrganizations();
+  }, []);
 
   return (
     <section className="mt-6 sm:mt-10 lg:mt-12 space-y-6 sm:space-y-10 mb-10 sm:mb-14">
       <div className="mx-auto">
-        {groups.map((group, idx) => (
-          <ClubGroup key={`club-group-${idx}`} items={group} />
+        {loading && (<div className="text-center text-gray-500 text-lg col-span-full">
+          {t("studentOrganizations.loading")}
+        </div>)}
+         {!loading && !error && organizations.length === 0 && (<div className="text-center text-gray-500 text-xl">{t("studentOrganizations.empty")}</div> )}
+
+        {error && (<div className="text-center text-red-400 text-lg col-span-full">{t("studentOrganizations.error")}</div>)}
+        {!loading && !error && organizations.length > 0 && organizations.map((group, idx) => (
+      
+          <ClubGroup key={`club-${idx}`} items={group} />
         ))}
       </div>
     </section>

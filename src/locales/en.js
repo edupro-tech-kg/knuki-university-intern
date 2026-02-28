@@ -810,6 +810,11 @@ export default {
       content: "Chairperson of the Faculty of Pop Music and Musical Education",
     },
   ],
+  studentOrganizations: {
+    loading: "Loading student organizations...",
+    error: "Error loading student organizations. Please try again later.",
+    empty: "No student organizations available.",
+  },
   studentClubs: [
     {
       key: "altynNur",
