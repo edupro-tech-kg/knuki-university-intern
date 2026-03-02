@@ -214,14 +214,6 @@ const DocumentTable = ({
     };
 
     const renderDesktopTable = () => {
-        if (!data || (Array.isArray(data) && data.length === 0)) {
-            return (
-                <div className="text-center py-8 text-gray-500">
-                    Нет данных для отображения
-                </div>
-            );
-        }
-
         if (!isGrouped || !Array.isArray(data)) {
             return (
                 <div className="border border-black">
@@ -258,14 +250,6 @@ const DocumentTable = ({
     };
 
     const renderMobileCards = () => {
-        if (!data || (Array.isArray(data) && data.length === 0)) {
-            return (
-                <div className="text-center py-8 text-gray-500">
-                    Нет данных для отображения
-                </div>
-            );
-        }
-
         if (!isGrouped || !Array.isArray(data)) {
             return data.map((item, index) => renderMobileCard(item, index));
         }
