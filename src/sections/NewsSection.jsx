@@ -1,22 +1,16 @@
-import React, {
-  useRef,
-  useEffect,
-  useState,
-  useCallback,
-} from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow, Navigation, Virtual } from "swiper/modules";
 import ButtonPrimary from "../components/UI/Button";
-import { FaArrowLeftLong } from "react-icons/fa6";
-import { FaArrowRightLong } from "react-icons/fa6";
+import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/navigation";
 import "swiper/css/virtual";
 
-import { getNews } from "../api/news"; // импорт функции API
+import { getNews } from "../api/news";
 
 export default function NewsSectionInfinite() {
   const { t, i18n } = useTranslation();
@@ -31,33 +25,34 @@ export default function NewsSectionInfinite() {
   const [slides, setSlides] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [activeSlideIndex, setActiveSlideIndex] = useState(10);
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
-  //* Получаем первые данные
   const fetchInitialNews = useCallback(async () => {
     try {
       const data = await getNews();
+      console.log(data);
+
       if (!Array.isArray(data)) return;
 
       const initialSlides = data.map((item, index) => ({
         id: index + 1,
-        slug: item.id,
-        image: item.imageUrl,
+        slug: item.slug,
+        image: item.image,
         title: item.title,
         buttonText: item.buttonText || readMoreLabel,
       }));
 
       setSlides(initialSlides);
+      setActiveSlideIndex(Math.min(10, initialSlides.length - 1));
     } catch (error) {
-  
+      console.error("Ошибка при загрузке новостей:", error);
     }
   }, [readMoreLabel]);
 
   useEffect(() => {
     fetchInitialNews();
-  }, [i18n.language]);
+  }, [i18n.language, fetchInitialNews]);
 
-  //* Подгрузка следующих слайдов
   const loadMoreSlides = useCallback(async () => {
     if (isLoading || !hasMore) return;
     setIsLoading(true);
@@ -75,18 +70,19 @@ export default function NewsSectionInfinite() {
 
       const newSlides = newArticles.map((item, i) => ({
         id: currentLength + i + 1,
-        slug: item.id,
-        image: item.imageUrl,
+        slug: item.slug,
+        image: item.image,
         title: item.title,
         buttonText: item.buttonText || readMoreLabel,
       }));
 
-      setSlides((prev) => [...prev, ...newSlides]);
-
-      if (swiperInstance) {
-        swiperInstance.update();
-        swiperInstance.virtual.update();
-      }
+      setSlides((prev) => {
+        const updated = [...prev, ...newSlides];
+        setTimeout(() => {
+          if (swiperInstance?.virtual) swiperInstance.virtual.update();
+        }, 0);
+        return updated;
+      });
     } catch (error) {
       console.error("Ошибка при добавлении слайдов:", error);
     } finally {
@@ -96,10 +92,9 @@ export default function NewsSectionInfinite() {
 
   const handleSlideChange = useCallback(
     (swiper) => {
-      const realIndex = swiper.activeIndex;
-      setActiveSlideIndex(realIndex);
+      setActiveSlideIndex(swiper.activeIndex);
 
-      if (realIndex >= slides.length - 6 && hasMore && !isLoading) {
+      if (swiper.activeIndex >= slides.length - 6 && hasMore && !isLoading) {
         loadMoreSlides();
       }
     },
@@ -107,20 +102,26 @@ export default function NewsSectionInfinite() {
   );
 
   useEffect(() => {
-    if (swiperInstance && prevRef.current && nextRef.current) {
-      swiperInstance.params.navigation.prevEl = prevRef.current;
-      swiperInstance.params.navigation.nextEl = nextRef.current;
-      swiperInstance.navigation.init();
-      swiperInstance.navigation.update();
+    if (!swiperInstance) return;
 
-      swiperInstance.on("slideChange", handleSlideChange);
+    const tryInitNav = () => {
+      if (prevRef.current && nextRef.current) {
+        swiperInstance.params.navigation.prevEl = prevRef.current;
+        swiperInstance.params.navigation.nextEl = nextRef.current;
+        swiperInstance.navigation.init();
+        swiperInstance.navigation.update();
+        swiperInstance.on("slideChange", handleSlideChange);
+      } else {
+        setTimeout(tryInitNav, 50);
+      }
+    };
+    tryInitNav();
 
-      return () => {
-        if (swiperInstance) {
-          swiperInstance.off("slideChange", handleSlideChange);
-        }
-      };
-    }
+    return () => {
+      if (swiperInstance) {
+        swiperInstance.off("slideChange", handleSlideChange);
+      }
+    };
   }, [swiperInstance, handleSlideChange]);
 
   return (
@@ -136,7 +137,7 @@ export default function NewsSectionInfinite() {
             centeredSlides={true}
             slidesPerView={"auto"}
             spaceBetween={40}
-            initialSlide={10}
+            initialSlide={activeSlideIndex}
             onSwiper={setSwiperInstance}
             modules={[EffectCoverflow, Navigation, Virtual]}
             className="w-full pb-16"
@@ -169,9 +170,8 @@ export default function NewsSectionInfinite() {
                 className="!h-72 md:!w-72 md:!h-96 lg:!w-80 lg:!h-[28rem]"
               >
                 <div
-                  className={`relative w-full h-full rounded-xl overflow-hidden shadow-xl transition-transform duration-500 ease-out ${
-                    index === activeSlideIndex ? "scale-100" : "scale-95"
-                  }`}
+                  className={`relative w-full h-full rounded-xl overflow-hidden shadow-xl transition-transform duration-500 ease-out ${index === activeSlideIndex ? "scale-100" : "scale-95"
+                    }`}
                   role="button"
                   tabIndex={0}
                   onClick={() => navigate(`/news/${slide.slug}`)}
@@ -183,11 +183,10 @@ export default function NewsSectionInfinite() {
                   }}
                 >
                   <img
-                    src={slide.image}
+                    src={slide.image || "https://knuki-university.s3.amazonaws.com/media/news/%D0%BA%D1%83%D0%BC%D0%B8%D1%83.jpg"}
                     alt={slide.title}
-                    className={`w-full h-full object-cover transition-all duration-500 ${
-                      index === activeSlideIndex ? "filter-none" : "grayscale"
-                    }`}
+                    className={`w-full h-full object-cover transition-all duration-500 ${index === activeSlideIndex ? "filter-none" : "grayscale"
+                      }`}
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/80" />

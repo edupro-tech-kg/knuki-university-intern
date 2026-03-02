@@ -114,7 +114,6 @@ function Applicants() {
             </div>
           </div>
 
-          {/* Map placeholder */}
           <TwoGisMap />
         </div>
       </div>
@@ -123,3 +122,4 @@ function Applicants() {
 }
 
 export default Applicants;
+

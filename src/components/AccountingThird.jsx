@@ -1,59 +1,73 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getAccounting } from "../api/accounting";
 
 function AccountingThird() {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
+  const [rows, setRows] = useState([]);
 
-    const rows = t("thirdAccounting.rows", { returnObjects: true });
+useEffect(() => {
+  async function loadAccounting() {
+    try {
+      const data = await getAccounting();
+      console.log("API response:", data);
 
-    return (
-        <div className="container-edge my-4 overflow-x-auto mt-16">
-            <table className="w-full border border-black text-sm text-center">
-                <thead>
-                    <tr>
-                        <th rowSpan="3" className="border border-black px-2 py-2">
-                            №
-                        </th>
-                        <th rowSpan="3" className="border border-black px-4 py-2">
-                            {t("thirdAccounting.specialty")}
-                        </th>
-                        <th rowSpan="3" className="border border-black px-2 py-2">
-                            {t("thirdAccounting.code")}
-                        </th>
-                        <th colSpan="6" className="border border-black px-4 py-2 font-semibold">
-                            {t("thirdAccounting.title")}
-                        </th>
-                    </tr>
-                    <tr>
-                        <th colSpan="6" className="border border-black py-2">
-                            {t("thirdAccounting.price")}
-                        </th>
-                    </tr>
-                    <tr>
-                        {t("thirdAccounting.courses", { returnObjects: true }).map((c, i) => (
-                            <th key={i} className="border border-black px-2 py-1">
-                                {c}
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
+      const rowsArray = Array.isArray(data.tuition_fees) ? data.tuition_fees : [];
+      console.log("Rows array:", rowsArray);
+      setRows(rowsArray);
 
-                <tbody>
-                    {rows.map((row, i) => (
-                        <tr key={i}>
-                            <td className="border border-black">{row.id}</td>
-                            <td className="border border-black text-left px-2">{row.name}</td>
-                            <td className="border border-black">{row.code}</td>
-                            {row.prices.map((price, idx) => (
-                                <td key={idx} className="border border-black">
-                                    {Array.isArray(price) ? price.map((p, j) => <div key={j}>{p}</div>) : price}
-                                </td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
+    } catch (error) {
+      console.error("Failed to load Accounting", error)
+    }
+  }
+  loadAccounting();
+}, []);
+
+  return (
+    <div className="container-edge my-4 overflow-x-auto mt-16">
+      <table className="w-full border border-black text-sm text-center">
+        <thead>
+          <tr>
+            <th rowSpan="3" className="border">№</th>
+            <th rowSpan="3" className="border">{t("thirdAccounting.specialty")}</th>
+            <th rowSpan="3" className="border">{t("thirdAccounting.code")}</th>
+            <th colSpan="6" className="border">{t("thirdAccounting.title")}</th>
+          </tr>
+          <tr>
+            <th colSpan="6" className="border">{t("thirdAccounting.price")}</th>
+          </tr>
+          <tr>
+            {t("thirdAccounting.courses", { returnObjects: true }).map((c, i) => (
+              <th key={i} className="border">{c}</th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          {/* {rows.map((row, i) => (
+            <tr key={i}>
+              <td className="border">{row.id}</td>
+              <td className="border text-left">{row.name}</td>
+              <td className="border">{row.code}</td>
+              {row.prices?.map((price, idx) => (
+                <td key={idx} className="border">{price}</td>
+              ))}
+            </tr>
+          ))} */}
+       
+  {Array.isArray(rows) && rows.map((row, i) => (
+    <tr key={i}>
+      <td className="border">{row.id}</td>
+      <td className="border text-left">{row.specialty_name}</td>
+      <td className="border">{row.code}</td>
+      <td className="border">{row.price || "-"}</td>
+    </tr>
+  ))}
+
+        </tbody>
+      </table>
+    </div>
+  );
 }
+
 export default AccountingThird;
