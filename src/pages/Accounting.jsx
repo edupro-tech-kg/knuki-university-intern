@@ -1,15 +1,13 @@
 import React from "react";
-import AccountingFirst from "../components/AccountingFirst.jsx";
-import AccountingFourth from "../components/AccountingFourth.jsx";
-import AccountingSecond from "../components/AccountingSecond.jsx";
-import AccountingThird from "../components/AccountingThird.jsx";
+import AccountingTable from "../components/AccountingTable.jsx";
+
 function Accounting() {
   return (
     <div>
-      <AccountingThird />
-      <AccountingFirst />
-      <AccountingFourth />
-      <AccountingSecond />
+      <AccountingTable tKey="firstAccounting" />
+      <AccountingTable tKey="secondAccounting" />
+      <AccountingTable tKey="thirdAccounting" />
+      <AccountingTable tKey="fourthAccounting" />
     </div>
   );
 }

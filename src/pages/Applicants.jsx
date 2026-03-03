@@ -114,7 +114,6 @@ function Applicants() {
             </div>
           </div>
 
-          {/* Map placeholder */}
           <TwoGisMap />
         </div>
       </div>
