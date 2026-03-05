@@ -1,14 +1,15 @@
-import { useTranslation } from "react-i18next";
+import UniversityStructureChart from "../components/UniversityStructureChart";
+import { getAdministrationList } from "../api/administrationService";
 import { useRef, useEffect, useState } from "react";
 import ManagementCard from "../components/ManagementCard";
 import ManagementModal from "../components/ManagementModal";
-import UniversityStructureChart from "../components/UniversityStructureChart";
+
 
 function ManagementPage() {
-  const { t, i18n } = useTranslation();
+  const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Получаем данные из переводов
-  const ManagementInfo = t("managementInfo", { returnObjects: true });
+
 
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,7 +27,23 @@ function ManagementPage() {
     setTimeout(() => setSelectedPerson(null), 300);
   };
 
-  useEffect(() => {}, [i18n.language]);
+
+  useEffect(() => {
+    const fetchList = async () => {
+      try {
+        const data = await getAdministrationList();
+        setList(data);
+        console.log("data:", data);
+      } catch (e) {
+        console.error("Ошибка загрузки администрации:", e);
+        setList([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchList(); 
+  }, []);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -73,34 +90,19 @@ function ManagementPage() {
     };
   }, []);
 
-  // Проверка наличия данных
-  if (!ManagementInfo || !ManagementInfo.person || !Array.isArray(ManagementInfo.person)) {
-    console.error("No management data found!");
-    return (
-      <section className="w-full mt-12 sm:mt-16 lg:mt-20 px-3 sm:px-4 lg:px-8">
-        <h1 className="text-lg sm:text-2xl lg:text-4xl font-semibold text-center mb-4 sm:mb-6 lg:mb-8 uppercase italic font-serif text-primary">
-          {ManagementInfo?.title || "Руководство"}
-        </h1>
-        <div className="text-center py-10">
-          <p className="text-gray-500">Данные не загружены</p>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <>
       <section className="w-full mt-5 sm:mt-16 lg:mt-12 px-3 sm:px-4 lg:px-8">
-        <h1 className="text-lg sm:text-2xl lg:text-4xl font-semibold text-center mb-4 sm:mb-6 lg:mb-8 uppercase italic font-serif text-primary">
-          {ManagementInfo.title}
-        </h1>
+        {}
 
         <div className="relative">
           <div
             ref={scrollContainerRef}
             className="flex md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-3 lg:gap-4 overflow-x-auto md:overflow-x-visible snap-x hide-scrollbar"
           >
-            {ManagementInfo.person.map((item, index) => {
+            {loading && <p className="text-center py-10">Загрузка...</p>}
+            {list.map((item, index) => {
               const hasAdditionalInfo =
                 item.additionalInfo && Object.keys(item.additionalInfo).length > 0;
 
@@ -110,10 +112,9 @@ function ManagementPage() {
                   className="flex-shrink-0 w-[70%] sm:w-[60%] md:w-full snap-start"
                 >
                   <ManagementCard
-                    name={item.name}
-                    post={item.post}
-                    image={item.image}
-                    btnText={ManagementInfo.btn}
+                    name={item.full_name}
+                    post={item.position}
+                    image={item.photo}
                     showButton={hasAdditionalInfo}
                     onOpenModal={hasAdditionalInfo ? () => handleOpenModal(item) : undefined}
                   />

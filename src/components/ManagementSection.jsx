@@ -1,42 +1,51 @@
 import { useEffect, useState } from "react";
 import ManagementCard from "./ManagementCard";
-import { getAdministrationList } from "../api/administrationService";
+import ManagementModal from "./ManagementModal";
 
 function ManagementSection() {
-  const [people, setPeople] = useState([]);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await getAdministrationList();
-        setPeople(data);
-      } catch (error) {
-        console.error("Ошибка загрузки:", error);
-      }
-    }
 
-    fetchData();
-  }, []);
+  const [isOpen, setIsOpen] = useState(false);
+  const [personId, setPersonId] = useState(null);
 
-  const handleOpenModal = (id) => {
-    console.log("Открыть модалку для", id);
+
+
+  const openModal = (id) => {
+    setPersonId(id);
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+    setPersonId(null);
   };
 
   return (
-    <div className="grid grid-cols-3 gap-4">
-      {people.map((person) => (
-        <ManagementCard
-          key={person.id}
-          id={person.id}
-          name={person.full_name}
-          post={person.position}
-          image={person.photo}
-          showButton={true}
-          onOpenModal={handleOpenModal}
-        />
-      ))}
-    </div>
+    <section className="w-full">
+      {loading ? (
+        <p className="text-center py-10">Загрузка...</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {list.map((person) => (
+            <ManagementCard
+              key={person.id}
+              id={person.id}
+              name={person.full_name}
+              post={person.position}
+              image={makePhotoUrl(person.photo)}
+              showButton={true}
+              btnText="Подробнее"
+              onOpenModal={openModal}
+            />
+          ))}
+        </div>
+      )}
+
+      <ManagementModal isOpen={isOpen} onClose={closeModal} personId={personId} />
+    </section>
   );
 }
 
 export default ManagementSection;
+
+// console.log("API DATA:", list);
