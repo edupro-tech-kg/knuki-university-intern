@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import DocumentTable from "./UI/DocumentTable";
 import { getDocuments } from "../api/documents";
 export default function NLAKyrgyzRepublic() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [krDocuments, setKrDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,7 +24,7 @@ export default function NLAKyrgyzRepublic() {
       }
     }
     loadDocuments();
-  }, []);
+  }, [i18n.language]);
 
  const tableData = (firstCategory?.documents || []).map((item, index) => ({
     id: item.id || index + 1,

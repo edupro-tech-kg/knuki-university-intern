@@ -18,7 +18,7 @@ const IMAGE_MAP = {
 
 export default function NewsList() {
   const [newsItems, setNewsItems] = useState([]);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,7 +49,7 @@ export default function NewsList() {
       }
     }
     loadNews();
-  }, []);
+  }, [i18n.language]);
 
   const cards = useMemo(
     () =>

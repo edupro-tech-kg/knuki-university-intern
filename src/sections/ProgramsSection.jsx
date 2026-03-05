@@ -1,13 +1,9 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import ButtonPrimary from "../components/UI/Button";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import { getFacultiesHomepage } from "../api";
-import music from "../assets/svg/music.svg";
-import mask from "../assets/svg/mask.svg";
-import projector from "../assets/svg/projector.svg";
-import ballerina from "../assets/svg/ballerina.svg";
 
 // const directions = [
 //   { icon: music, slug: "choreography" },
@@ -19,12 +15,11 @@ import ballerina from "../assets/svg/ballerina.svg";
 // ];
 
 export default function ProgramsSection() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const containerRef = useRef(null);
   const [isDesktop, setIsDesktop] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const [faculties, setFaculties] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchFaculties() {
@@ -33,13 +28,11 @@ export default function ProgramsSection() {
         setFaculties(data);
       } catch (error) {
         console.error("Failed to load faculties:", error);
-      } finally {
-        setLoading(false);
       }
     }
 
     fetchFaculties();
-  }, []);
+  }, [i18n.language]);
 
 
 
@@ -156,15 +149,6 @@ export default function ProgramsSection() {
     }
   };
 
-  const facultiesTitles = useMemo(
-    () => t("facultiesData.items", { returnObjects: true }) || {},
-    [t]
-  );
-  const programList = useMemo(() => t("programs.list", { returnObjects: true }) || [], [t]);
-
-  const getTitle = (slug, index) =>
-    facultiesTitles?.[slug]?.title || programList?.[index]?.title || slug;
-
   return (
     <section
       id="programs"
@@ -189,7 +173,7 @@ export default function ProgramsSection() {
               [scrollbar-width:none]
             `}
           >
-            {faculties.map((faculty, index) => (
+            {faculties.map((faculty) => (
               <Link
                 to={`/faculty/${faculty.id}`}
                 key={faculty.id}

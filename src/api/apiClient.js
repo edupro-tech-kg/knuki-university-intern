@@ -28,13 +28,8 @@ apiClient.interceptors.request.use((config) => {
 
   const headers = config.headers;
   const hasAxiosHeaderSet = headers && typeof headers.set === "function";
-  const current =
-    (hasAxiosHeaderSet ? headers.get("Accept-Language") : headers?.["Accept-Language"]) ?? null;
-
-  if (!current) {
-    if (hasAxiosHeaderSet) headers.set("Accept-Language", locale);
-    else config.headers = { ...(headers || {}), "Accept-Language": locale };
-  }
+  if (hasAxiosHeaderSet) headers.set("Accept-Language", locale);
+  else config.headers = { ...(headers || {}), "Accept-Language": locale };
 
   return config;
 });

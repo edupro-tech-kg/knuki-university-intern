@@ -5,7 +5,7 @@ import DocumentTable from "../components/UI/DocumentTable";
 import { getDocuments } from "../api/documents";
 
 export default function NLAkguki() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [modalState, setModalState] = useState({
     isOpen: false,
     pdf: null,
@@ -33,7 +33,7 @@ export default function NLAkguki() {
       }
     }
       loadDocunments();
-  }, []);
+  }, [i18n.language]);
 
   const tableData = (secondCategory?.documents || []).map((item, index) => ({
     id: item.id || index + 1,

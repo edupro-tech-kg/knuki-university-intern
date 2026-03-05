@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getStudents } from "../api/students";
 
 function StudentsInfo() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const scrollRef = useRef(null);
   const [students, setStudents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +25,7 @@ useEffect(() => {
   }
 
   loadStudents();
-  }, []);
+  }, [i18n.language]);
 
   const handleScroll = () => {
     const el = scrollRef.current;

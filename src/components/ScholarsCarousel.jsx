@@ -4,7 +4,7 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { getScholarship } from "../api/certificates";
 
 function ScholarsCarousel({ variant = "scholarship", showTitle = true }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const containerRef = useRef(null);
   const [showControls, setShowControls] = useState(false);
   const [students, setStudents] = useState([]);
@@ -56,7 +56,7 @@ function ScholarsCarousel({ variant = "scholarship", showTitle = true }) {
       }
     }
     loadData();
-  }, [variant]);
+  }, [variant, i18n.language]);
 
   return (
     <div className="my-12">

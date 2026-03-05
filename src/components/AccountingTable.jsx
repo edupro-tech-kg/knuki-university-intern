@@ -3,14 +3,14 @@ import { useTranslation } from "react-i18next";
 import { getAccounting } from "../api/accounting";
 
 function AccountingTable({ tKey, courseCount = 6, marginTop = "my-4" }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
     getAccounting()
       .then(data => setRows(Array.isArray(data?.tuition_fees) ? data.tuition_fees : []))
       .catch(err => console.error("Failed to load Accounting", err));
-  }, []);
+  }, [i18n.language]);
 
   return (
     <div className={`container-edge ${marginTop} overflow-x-auto mb-16`}>
