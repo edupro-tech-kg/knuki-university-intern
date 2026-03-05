@@ -3,25 +3,45 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import ButtonPrimary from "../components/UI/Button";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
+import { getFacultiesHomepage } from "../api";
 import music from "../assets/svg/music.svg";
 import mask from "../assets/svg/mask.svg";
 import projector from "../assets/svg/projector.svg";
 import ballerina from "../assets/svg/ballerina.svg";
 
-const directions = [
-  { icon: music, slug: "choreography" },
-  { icon: mask, slug: "folk-music" },
-  { icon: projector, slug: "estrada-music" },
-  { icon: ballerina, slug: "theater" },
-  { icon: music, slug: "kino-tele" },
-  { icon: mask, slug: "postgraduate" },
-];
+// const directions = [
+//   { icon: music, slug: "choreography" },
+//   { icon: mask, slug: "folk-music" },
+//   { icon: projector, slug: "estrada-music" },
+//   { icon: ballerina, slug: "theater" },
+//   { icon: music, slug: "kino-tele" },
+//   { icon: mask, slug: "postgraduate" },
+// ];
 
 export default function ProgramsSection() {
   const { t } = useTranslation();
   const containerRef = useRef(null);
   const [isDesktop, setIsDesktop] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  const [faculties, setFaculties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchFaculties() {
+      try {
+        const data = await getFacultiesHomepage();
+        setFaculties(data);
+      } catch (error) {
+        console.error("Failed to load faculties:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFaculties();
+  }, []);
+
+
 
   useEffect(() => {
     const checkDesktop = () => {
@@ -53,53 +73,53 @@ export default function ProgramsSection() {
     return { cardWidth, gap, scrollAmount: cardWidth + gap };
   };
 
-  const handleNext = () => {
-    if (!containerRef.current || !isDesktop) return;
+  // const handleNext = () => {
+  //   if (!containerRef.current || !isDesktop) return;
 
-    const container = containerRef.current;
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-    const { scrollAmount } = getScrollAmount();
+  //   const container = containerRef.current;
+  //   const { scrollLeft, scrollWidth, clientWidth } = container;
+  //   const { scrollAmount } = getScrollAmount();
 
-    const newScrollLeft = scrollLeft + scrollAmount;
+  //   const newScrollLeft = scrollLeft + scrollAmount;
 
-    if (newScrollLeft >= scrollWidth - clientWidth - 1) {
-      const endScrollLeft = scrollWidth - clientWidth;
-      container.scrollTo({ left: endScrollLeft, behavior: "smooth" });
+  //   if (newScrollLeft >= scrollWidth - clientWidth - 1) {
+  //     const endScrollLeft = scrollWidth - clientWidth;
+  //     container.scrollTo({ left: endScrollLeft, behavior: "smooth" });
 
-      setTimeout(() => {
-        container.scrollTo({ left: 0, behavior: "auto" });
-        setTimeout(() => {
-          container.scrollTo({ left: scrollAmount, behavior: "smooth" });
-        }, 50);
-      }, 300);
-    } else {
-      container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
-    }
-  };
+  //     setTimeout(() => {
+  //       container.scrollTo({ left: 0, behavior: "auto" });
+  //       setTimeout(() => {
+  //         container.scrollTo({ left: scrollAmount, behavior: "smooth" });
+  //       }, 50);
+  //     }, 300);
+  //   } else {
+  //     container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
+  //   }
+  // };
 
-  const handlePrev = () => {
-    if (!containerRef.current || !isDesktop) return;
+  // const handlePrev = () => {
+  //   if (!containerRef.current || !isDesktop) return;
 
-    const container = containerRef.current;
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-    const { scrollAmount } = getScrollAmount();
+  //   const container = containerRef.current;
+  //   const { scrollLeft, scrollWidth, clientWidth } = container;
+  //   const { scrollAmount } = getScrollAmount();
 
-    const newScrollLeft = scrollLeft - scrollAmount;
+  //   const newScrollLeft = scrollLeft - scrollAmount;
 
-    if (newScrollLeft < 0) {
-      container.scrollTo({ left: 0, behavior: "smooth" });
+  //   if (newScrollLeft < 0) {
+  //     container.scrollTo({ left: 0, behavior: "smooth" });
 
-      setTimeout(() => {
-        const endScrollLeft = scrollWidth - clientWidth;
-        container.scrollTo({ left: endScrollLeft, behavior: "auto" });
-        setTimeout(() => {
-          container.scrollTo({ left: endScrollLeft - scrollAmount, behavior: "smooth" });
-        }, 50);
-      }, 300);
-    } else {
-      container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
-    }
-  };
+  //     setTimeout(() => {
+  //       const endScrollLeft = scrollWidth - clientWidth;
+  //       container.scrollTo({ left: endScrollLeft, behavior: "auto" });
+  //       setTimeout(() => {
+  //         container.scrollTo({ left: endScrollLeft - scrollAmount, behavior: "smooth" });
+  //       }, 50);
+  //     }, 300);
+  //   } else {
+  //     container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
+  //   }
+  // };
 
   const handleNextSimple = () => {
     if (!containerRef.current || !isDesktop) return;
@@ -169,10 +189,10 @@ export default function ProgramsSection() {
               [scrollbar-width:none]
             `}
           >
-            {directions.map((dir, index) => (
+            {faculties.map((faculty, index) => (
               <Link
-                to={`/faculty/${dir.slug}`}
-                key={dir.slug}
+                to={`/faculty/${faculty.id}`}
+                key={faculty.id}
                 className={`
                   group 
                   ${
@@ -188,14 +208,14 @@ export default function ProgramsSection() {
               >
                 <div className="p-6 flex flex-col h-full">
                   <h3 className="font-sans text-xl font-medium text-white mb-4 mt-4">
-                    {getTitle(dir.slug, index)}
+                    {faculty.faculty_name}
                   </h3>
 
                   <div className="flex-grow"></div>
 
                   <div className="mb-4 flex justify-end mt-auto">
                     <div className="bg-primary p-4 transition-colors duration-300 group-hover:bg-text-primary">
-                      <img src={dir.icon} alt="" className="w-20 h-20" />
+                      <img src={faculty.icon} alt="" className="w-20 h-20" />
                     </div>
                   </div>
 
