@@ -23,6 +23,8 @@ export default function NLAkguki() {
         setLoading(true);
         setError(null);
         const data = await getDocuments();
+        console.log(data);
+        
         setKgukiDocuments(data);
       } catch (error) {
         setError(error.message || "Failed to load documents");
@@ -36,7 +38,7 @@ export default function NLAkguki() {
   const tableData = (secondCategory?.documents || []).map((item, index) => ({
     id: item.id || index + 1,
     text: item.description,
-    link: item.document_url,
+    pdf: item.document_url,
     index: index + 1,
   }));
 
