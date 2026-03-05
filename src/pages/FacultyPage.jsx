@@ -14,7 +14,7 @@ export default function FacultyPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [faculties2, setFaculties2] = useState([]);
+  const [faculties, setFaculties] = useState([]);
   const [ load, setLoad ] = useState(true);
   const [error, setError] = useState(null);
 
@@ -32,7 +32,7 @@ export default function FacultyPage() {
       setError(null);
       try {
         const data = await getFaculty();
-        setFaculties2(data);
+        setFaculties(data);
         console.log(data);
         
       } catch (error) {
@@ -46,19 +46,9 @@ export default function FacultyPage() {
 
   const currentLanguage = getCurrentLanguageCode();
 
-  const localizedFaculties = useMemo(() => {
-    try {
-      const lang = i18n.language;
-      return t("facultiesData.items", { returnObjects: true, lng: lang }) || {};
-    } catch (error) {
-      console.warn("Could not load localized faculties data:", error);
-      return {};
-    }
-  }, [t, i18n.language]);
-
 const faculty = useMemo(() => {
-  return faculties2.find((f) => f.slug === slug);
-}, [faculties2, slug]);
+  return faculties.find((f) => f.slug === slug);
+}, [faculties, slug]);
 
   useEffect(() => {
     setActiveTabIndex(0);
