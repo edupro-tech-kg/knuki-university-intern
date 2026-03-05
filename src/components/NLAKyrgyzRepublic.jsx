@@ -1,166 +1,51 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { useTranslation } from "react-i18next";
 import DocumentTable from "./UI/DocumentTable";
+import { getDocuments } from "../api/documents";
 export default function NLAKyrgyzRepublic() {
   const { t } = useTranslation();
+  const [krDocuments, setKrDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const firstCategory = krDocuments[0]; 
 
-  const STATIC_ITEMS = [
-    {
-      text: "Кыргыз Республикасынын Өкмөтүнүн 2011-жылдын 23-августундагы № 496 токтому. Кыргыз Республикасында жогорку кесиптик билим берүүнүн эки деңгээлдүү түзүмүн белгилөө жөнүндө",
-      link: "https://cbd.minjust.gov.kg/7-14864/edition/19609/kg?editionCode=exact",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2024-жылдын 27-сентябрындагы № 590 Жогорку кесиптик билим берүүнүн билим берүү уюмдарынын ишин жөнгө салган ченемдик укуктук актыларды бекитүү жөнүндө токтому.",
-      link: "https://cbd.minjust.gov.kg/7-33050/edition/17445/kg",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2024-жылдын 27-сентябрындагы № 590 токтомуна 1-тиркеме. Академиялык эркиндикти колдоону жогорулатуу кесиптик билим берүү уюмдарына билим берүү программаларын иштеп чыгууга коюлуучу талаптарды белгилөө",
-      link: "https://cbd.minjust.gov.kg/230318483/edition/17447/kg?lang=kg",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2024-жылдын 27-сентябрындагы № 590 токтомуна 2-тиркеме. КРнын жогорку кесиптик билим берүүнүн билим берүү уюмдарынын билим алуучуларын которуу, окуудан чыгаруу, окууга калыбына келтирүү жана академиялык өргүү берүү тартиби жөнүндө ЖОБО.",
-      link: "https://cbd.minjust.gov.kg/230014839/edition/17452/kg?lang=kg",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2024-жылдын 27-сентябрындагы № 590 токтомуна 3-тиркеме. КРнын жогорку кесиптик билим берүүнүн билим берүү уюмдарынын билим алуучуларын учурдагы контролдоо жана орто аралык аттестациялоо жөнүнө ЖОБО",
-      link: "https://cbd.minjust.gov.kg/230051681/edition/17455/kg?lang=kg",
-    },
-    {
-      text: "AIS диплом 2025 санариптик реестри жөнүндө жобо.",
-      link: "https://diplom.edu.gov.kg/diploma/",
-    },
-    {
-      text: "2024-жылдын 22-майындагы № 258 токтому. ИМА жөнүндө ЖОБО",
-      link: "https://cbd.minjust.gov.kg/46-3664/edition/8733/ru",
-    },
-    {
-      text: "2025-жылдын 10-июну КР Министрлер Кабинетинин № 329 Кесиптик жогорку жана орто билим берүү жаатындагы ченемдик укуктук актыларды бекитүү жөнүндө токтому.",
-      link: "https://cbd.minjust.gov.kg/7-43071/edition/34437/kg",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2025-жылдын 10-июнундагы № 329 токтомуна 1-тиркеме. Кыргыз Республикасынын кесиптик жогорку жана жогорку окуу жайынан кийинки билим берүү уюму жөнүндө ЖОБО.",
-      link: "https://cbd.minjust.gov.kg/230029680/edition/35047/kg?lang=kg",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2025-жылдын 10-июнундагы № 329 токтомуна 2-тиркеме. Кыргыз Республикасынын кесиптик жогорку жана орто билим берүүсүнүн мамлекеттик билим берүү стандарттары жөнүндө ЖОБО.",
-      link: "https://cbd.minjust.gov.kg/230029723/edition/35177/kg?lang=kg",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2025-жылдын 10-июнундагы № 329 токтомуна 3-тиркеме. Кыргыз Республикасынын кесиптик жогорку жана орто билим берүүнүн окуу-методикалык бирикмеси жөнүндө ЖОБО.",
-      link: "https://cbd.minjust.gov.kg/230029742/edition/35178/kg?lang=kg",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2025-жылдын 10-июнундагы № 329 токтомуна 4-тиркеме. Кыргыз Республикасынын кесиптик жогорку билим берүү уюмунун факультети жана кафедрасы жөнүндө ЖОБО.",
-      link: "https://cbd.minjust.gov.kg/230029762/edition/35180/kg?lang=kg",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2025-жылдын 10-июнундагы № 329 токтомуна 5-тиркеме. Кыргыз Республикасынын кесиптик жогорку билим берүү уюмунун окумуштуулар кеңеши жөнүндө ЖОБО.",
-      link: "https://cbd.minjust.gov.kg/230029770/edition/35181/kg?lang=kg",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2025-жылдын 10-июнундагы № 329 токтомуна 6-тиркеме. Кыргыз Республикасынын кесиптик жогорку билим берүү уюмдарында профессордук-окутуучулук курамдын кызмат орундарын ээлөө тартиби жөнүндө ЖОБО.",
-      link: "https://cbd.minjust.gov.kg/230029826/edition/35182/kg?lang=k",
-    },
-    {
-      text: "КР Министрлер Кабинетинин 2025-жылдын 10-июнундагы № 329 токтомуна 7-тиркеме. Кыргыз Республикасында кесиптик кошумча билим берүү жөнүндө ЖОБО.",
-      link: "https://cbd.minjust.gov.kg/230029729/edition/35183/kg?lang=kg",
-    },
-    {
-      text: "Постановление №231 от 10 мая 2024 года Кыргызской Республики. О порядке финансирования государственных образовательных организация НПО, СПО и ВПО.",
-      link: "https://drive.google.com/file/d/10IJ84Fae5tIlB9Pwn0W_mG4hOyqK6I-Z/view",
-    },
-    {
-      text: "КОНСТИТУЦИЯ КЫРГЫЗСКОЙ РЕСПУБЛИКИ",
-      link: "https://cbd.minjust.gov.kg/1-2/edition/1202952/ru",
-    },
-    {
-      text: "ЗАКОН КЫРГЫЗСКОЙ РЕСПУБЛИКИ “Об образовании”",
-      link: "https://cbd.minjust.gov.kg/4-3419/edition/1273902/ru",
-    },
-    {
-      text: "Закон КР «О попечительском совете»",
-      link: "https://cbd.minjust.gov.kg/205301/edition/1250971/ru",
-    },
-    {
-      text: "Закон КР «О лицензионно-разрешительной системе в КР»",
-      link: "https://cbd.minjust.gov.kg/205058/edition/5583/ru",
-    },
-    {
-      text: "Трудовой кодекс КР",
-      link: "https://cbd.minjust.gov.kg/3-45/edition/25298/ru",
-    },
-    {
-      text: "Гражданский кодекс КР",
-      link: "https://cbd.minjust.gov.kg/3-1/edition/1263361/ru",
-    },
-    {
-      text: "КРнын Президентинин ЖАРЛЫГЫ Бүбүсара Бейшеналиева атындагы Кыргыз мамлекеттик маданият жана искусство университетине “улуттук” деген статусту ыйгаруу жөнүндө. № 96, 22.03.2025.",
-      link: "https://drive.google.com/drive/folders/1antzCIeSKgrWFbg7IWE8AuUMWgYF_zfY",
-    },
-    {
-      text: "КР Президентинин № 369 Жарлыгы (“Улуттук дем — дүйнөлүк бийиктик” уңгужолу",
-      link: "https://cbd.minjust.gov.kg/18-11/edition/23328/kg",
-    },
-    {
-      text: "Постановление №258 от 22.05.2024. ПОЛОЖЕНИЕ об ИГА",
-      link: "https://cbd.minjust.gov.kg/46-3664/edition/8733/ru",
-    },
-    {
-      text: "ПОСТАНОВЛЕНИЕ КАБИНЕТА МИНИСТРОВ КЫРГЫЗСКОЙ РЕСПУБЛИКИ от 15 мая 2024 года № 246 Об утверждении нормативных правовых актов по аккредитации в сфере образования",
-      link: "https://cbd.minjust.gov.kg/7-27373/edition/8972/ru?lang=ru",
-    },
-    {
-      text: "ПОЛОЖЕНИЕ о Министерстве культуры, информации и молодежной политики Кыргызской РеспубликиПриложение 1 (к постановлению Кабинета Министров Кыргызской Республики от 10 июня 2025 года № 328)",
-      link: " https://cbd.minjust.gov.kg/230028300/edition/33401/ru?lang=ru",
-    },
-    {
-      text: "МИНИСТЕРСТВО ОБРАЗОВАНИЯ И НАУКИ КЫРГЫЗСКОЙ РЕСПУБЛИКИ ПРИКАЗ от 21 сентября 2021 года № 1578/1 «Об утверждении государственных образовательных стандартов высшего профессионального образования»",
-      link: "https://cbd.minjust.gov.kg/200662/edition/1111936/ru?anchor=pr1",
-    },
-    {
-      text: "Кыргыз Республикасынын Министрлер Кабинетинин 2024-жылдын 4-июлу № 358 Жогорку окуу жайынан кийинки кесиптик билим берүү программалары боюнча илимий жана илимий-педагогикалык кадрларды даярдоо жөнүндө жобону бекитүү тууралуу Токтому",
-      link: "https://cbd.minjust.gov.kg/7-32255/edition/16497/kg",
-    },
-    {
-      text: "Кыргыз Республикасынын Министрлер Кабинети 2022-жылдын 30-марты № 181 Билим берүү системасынын педагогикалык жана айрым категориялардагы кызматкерлсрине эмгек акы төлоонүн шарттары жөнүндөТоктому",
-      link: "https://cbd.minjust.gov.kg/159046/edition/7672/kg",
-    },
-    {
-      text: "Положение о документах о среднем и высшем профессиональном образовании государственного образца, порядке их изготовления, оплаты, хранения, выдачи и учета. Приложение к приказу МОН КР от 10.03.2025 года №249/1.",
-      link: "https://drive.google.com/file/d/157mBJJzWnvzuuzMkWBIIhCl6Pd0dM_c8/view",
-    },
-    {
-      text: "КЫРГЫЗ РЕСПУБЛИКАСЫНЫН КОНСТИТУЦИЯЛЫК МЫЙЗАМЫ 2023-жылдын 17-июлу № 140 Кыргыз Республикасынын мамлекеттик тили жөнүндө",
-      link: "https://cbd.minjust.gov.kg/112618/edition/1264993/kg",
-    },
-    {
-      text: "«Кыргызтест» мамлекеттик тилди билүү деңгээлин баалоо тутумун өнүктүрүү жана киргизүү Концепциясы Кыргыз Республикасынын Өкмөтүнүн 2013-жылдын 26-мартындагы № 150 токтому",
-      link: "https://kyrgyztest.gov.kg/wp-content/uploads/2021/03",
-    },
-    {
-      text: "2014-2020-жылдары мамлекеттик тилди өнүктүрүүнүн жана тил саясатын өркүндөтүүнүн Улуттук Программасы",
-      link: "https://kyrgyztest.gov.kg/wp-content/uploads/2021/03",
-    },
-    {
-      text: "Кыргыз Республикасында 2021-2025-жылдары мамлекеттик тилди өнүктүрүү жана тил саясатын өркүндөтүү программасы \n (КР Министрлер Кабинетинин 2022-жылдын 7-февралындагы № 67, 2023-жылдын 10-февралындагы № 64 токтомдоруну)",
-      link: "https://cbd.minjust.gov.kg/157938/edition/1230456/kg",
+  useEffect(() => {
+    const loadDocuments = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getDocuments();
+        setKrDocuments(data);
+      } catch (error) {
+        console.error("Error loading documents:", error);
+        setError(error.message || "Failed to load documents");
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    loadDocuments();
+  }, []);
 
-  const tableData = STATIC_ITEMS.map((item, index) => ({
-    id: index + 1,
-    text: item.text,
-    link: item.link,
+ const tableData = (firstCategory?.documents || []).map((item, index) => ({
+    id: item.id || index + 1,
+    text: item.description,
+    link: item.document_url,
     index: index + 1,
-  }));
+}));
 
   return (
     <section className="container mx-auto px-4 sm:px-6 lg:px-20 py-3">
       <h1 className="font-serif text-primary text-2xl sm:text-3xl md:text-4xl text-center py-6 md:py-9 uppercase italic">
         {t("documentNLA.title")}
       </h1>
-
-      <DocumentTable
+      {loading && <div className="text-center py-4">{t("documentNLA.loading")}</div>}
+      {error && <div className="text-center py-4 text-red-500">{t("documentNLA.error")}: {error}</div>}
+      {!loading && !error && tableData.length === 0 ? (
+      <div className="text-center py-10 border border-dashed border-gray-400 rounded-lg">
+        <p className="text-gray-500 text-lg">{t("documentNLA.empty")}</p>
+      </div>
+    ) : (
+      krDocuments && <DocumentTable
         data={tableData}
         config={{
           hasIndexColumn: true,
@@ -180,7 +65,7 @@ export default function NLAKyrgyzRepublic() {
         }}
         buttonText={t("documentNLA.btnText") || "Открыть документ"}
         mobileView="cards"
-      />
+      />)}
     </section>
   );
 }

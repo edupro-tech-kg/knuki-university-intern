@@ -1878,10 +1878,16 @@ export default {
   documentNLA: {
     title: "Legal Acts of the Kyrgyz Republic",
     btnText: "More",
+    loading: "Loading documents...",
+    error: "Error loading documents",
+    empty: "No documents available.",
   },
   NLAknuki: {
     title: "Legal Acts of the KNUCA",
     btnText: "More",
+    loading: "Loading documents...",
+    error: "Error loading documents",
+    empty: "No documents available.",
   },
   sciencePage: {
     tabs: {

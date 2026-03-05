@@ -1905,10 +1905,16 @@ export default {
   documentNLA: {
     title: "НПА КР",
     btnText: "Подробнее",
+    loading: "Загрузка документов...",
+    error: "Ошибка загрузки документов",
+    empty: "Нет документов",
   },
   NLAknuki: {
     title: "НПА КНУКИ",
     btnText: "Подробнее",
+    loading: "Загрузка документов...",
+    error: "Ошибка загрузки документов",
+    empty: "Нет документов",
   },
   sciencePage: {
     tabs: {
