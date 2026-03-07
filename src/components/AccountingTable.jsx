@@ -15,19 +15,30 @@ function AccountingTable({ tKey, courseCount = 6, marginTop = "my-4" }) {
   return (
     <div className={`container-edge ${marginTop} overflow-x-auto mb-16`}>
       <table className="w-full border border-black text-sm text-center">
-        <thead>
-          <tr>
-            <th rowSpan="2" className="border">№</th>
-            <th rowSpan="2" className="border">{t(`${tKey}.specialty`)}</th>
-            <th rowSpan="2" className="border">{t(`${tKey}.code`)}</th>
-            <th colSpan={courseCount} className="border">{t(`${tKey}.price`)} (сом)</th>
-          </tr>
-          <tr>
-            {Array.from({ length: courseCount }).map((_, i) => (
-              <th key={i} className="border">{i + 1} {t("course")}</th>
-            ))}
-          </tr>
-        </thead>
+     <thead>
+  <tr>
+    <th rowSpan="3" className="border">№</th>
+    <th rowSpan="3" className="border">Специальность</th>
+    <th rowSpan="3" className="border">Шифр</th>
+    <th colSpan={courseCount} className="border">
+      Срок обучения 5 лет, дневная форма обучения
+    </th>
+  </tr>
+
+  <tr>
+    <th colSpan={courseCount} className="border">
+      стоимость обучения в сомах
+    </th>
+  </tr>
+
+  <tr>
+    {Array.from({ length: courseCount }).map((_, i) => (
+      <th key={i} className="border">
+        {i + 1} курс
+      </th>
+    ))}
+  </tr>
+</thead>
         <tbody>
           {rows.map((row, i) => (
             <tr key={i}>
