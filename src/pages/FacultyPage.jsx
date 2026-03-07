@@ -1,6 +1,5 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import FacultyHero from "../components/faculty/FacultyHero";
 import FacultyInfoBlocks from "../components/faculty/FacultyInfoBlocks";
@@ -8,13 +7,16 @@ import FacultyStats from "../components/faculty/FacultyStats";
 import FacultyTeachersTabs from "../components/faculty/FacultyTeachersTabs";
 import FacultyTextTabs from "../components/faculty/FacultyTextTabs";
 import DocumentsSection from "../components/faculty/DocumentsSection";
-import { getFacultyData } from "../data/faculties";
+import { getFaculty } from "../api/faculty";
 
 export default function FacultyPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [faculties, setFaculties] = useState([]);
+  const [ load, setLoad ] = useState(true);
+  const [error, setError] = useState(null);
 
   const getCurrentLanguageCode = () => {
     const lang = i18n.language;
@@ -24,22 +26,29 @@ export default function FacultyPage() {
     return "kg";
   };
 
+  useEffect(() => {
+    async function loadFaculty() {
+      setLoad(true);
+      setError(null);
+      try {
+        const data = await getFaculty();
+        setFaculties(data);
+        console.log(data);
+        
+      } catch (error) {
+        console.error("Error fetching faculty:",error);
+      } finally {
+        setLoad(false)
+      }
+    }
+    loadFaculty();
+  }, [])
+
   const currentLanguage = getCurrentLanguageCode();
 
-  const localizedFaculties = useMemo(() => {
-    try {
-      const lang = i18n.language;
-      return t("facultiesData.items", { returnObjects: true, lng: lang }) || {};
-    } catch (error) {
-      console.warn("Could not load localized faculties data:", error);
-      return {};
-    }
-  }, [t, i18n.language]);
-
-  const faculty = useMemo(
-    () => getFacultyData(slug, localizedFaculties, currentLanguage),
-    [slug, localizedFaculties, currentLanguage, i18n.language]
-  );
+const faculty = useMemo(() => {
+  return faculties.find((f) => f.slug === slug);
+}, [faculties, slug]);
 
   useEffect(() => {
     setActiveTabIndex(0);
