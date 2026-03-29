@@ -2,19 +2,7 @@ import { useMemo, useState, useEffect, } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { getNews } from "../api/news";
-import makam from "../assets/images/makam.jpg";
-import grand1 from "../assets/images/grand1.jpg";
-import construction1 from "../assets/images/construction1.jpg";
-import instrument2 from "../assets/images/instrument2.jpg";
-import newGym from "../assets/images/newGym.jpg";
-
-const IMAGE_MAP = {
-  makam,
-  students: grand1,
-  building: construction1,
-  instruments: instrument2,
-  gym: newGym,
-};
+import newsPlaceholder from "../assets/images/newsPlaceholder.jpg";
 
 export default function NewsList() {
   const [newsItems, setNewsItems] = useState([]);
@@ -29,21 +17,10 @@ export default function NewsList() {
         setLoading(true);
         setError(null);
         const data = await getNews();
-        console.log("API RESPONSE:", data);
-        if (!data || data.length === 0) {
-          setNewsItems([]);
-        } else {
-          setNewsItems(data);
-        }
+        setNewsItems(data);
       } catch (error) {
         console.error("real error:", error);
         setError("Failed to load news");
-        if (error.response?.status >= 500) {
-          setError("Server error. Please try again later.");
-        } else {
-          setError("Failed to load news.");
-          setNewsItems([])
-        }
       } finally {
         setLoading(false);
       }
@@ -53,14 +30,13 @@ export default function NewsList() {
 
   const cards = useMemo(
     () =>
-      newsItems.map((item, idx) => {
-        const slug = item?.id ?? idx + 1;
-        const mapped = item?.id && IMAGE_MAP[item.id];
-        const fallback = Object.values(IMAGE_MAP)[idx % Object.values(IMAGE_MAP).length];
+      newsItems.map((item) => {
+        let image = item?.image || newsPlaceholder;
+        const realId = item?.id;
         return {
-          id: slug,
+          id: realId,
           title: item?.title || t("news.title"),
-          image: mapped || fallback,
+          image: image,
           buttonText: item?.buttonText || t("news.readMore", { defaultValue: t("news.title") }),
         };
       }),
